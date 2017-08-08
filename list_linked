@@ -1,0 +1,413 @@
+// ---------------------------------------------------------------------------
+// list_linked.cpp
+// Linked List Implementation
+// ---------------------------------------------------------------------------
+#ifndef LIST_LINKED_CPP
+#define LIST_LINKED_CPP
+
+#include <iostream>
+#include <vector>
+#include <cstring>
+using namespace std;
+
+#include "list_linked.h"
+
+//-----------------------------------------------------------------------------
+// ListNode constructor
+//-----------------------------------------------------------------------------
+template <class T>
+List<T>::ListNode::ListNode(const T& nodeData, ListNode* nextPtr)
+    : dataItem(nodeData), next(nextPtr)
+{
+}
+
+//-----------------------------------------------------------------------------
+// Default constructor (int ignored)
+//-----------------------------------------------------------------------------
+template <class T>
+List<T>::List(int ignored) : head(0), cursor(0)
+{
+}
+
+//-----------------------------------------------------------------------------
+// Copy constructor
+//-----------------------------------------------------------------------------
+template <class T>
+List<T>::List(const List<T>& other)
+{
+	if(other.head == NULL)
+	{
+        head = NULL;
+        cursor = NULL;
+	}
+    else
+	{
+        ListNode* temp = other.head->next;
+        
+        while(temp != NULL){
+            temp->next = new ListNode(temp->dataItem, NULL);
+            temp = temp->next;
+        }
+        insert(temp->dataItem);
+    }
+}
+
+//-----------------------------------------------------------------------------
+// Overloaded assignment operator. Reinitializes the list to be 
+// equivalent in content to the "other" list.
+// Note: we include self-assignment protection by checking whether
+// "this" object is identical to the "other" object.
+//-----------------------------------------------------------------------------
+template <class T>
+List<T>& List<T>::operator=(const List<T>& other)
+{	
+	if(this == & other){
+        return *this;
+    }
+    while(head != NULL){
+        ListNode* temp = head;
+        head = head->next;
+        delete temp;
+    }
+    
+    if(other.head == NULL)
+        head = NULL;
+    else{
+        head = new ListNode(other.head->dataItem, NULL);
+        ListNode* temp = other.head->next;
+        ListNode* temp2 = head;
+        while(temp != NULL){
+            temp2->next = new ListNode(temp->dataItem, NULL);
+            temp = temp->next;
+            temp2 = temp2->next;
+        }
+    }
+    return *this;
+}
+
+//-----------------------------------------------------------------------------
+// Destructor. Frees the memory used by a list.
+//-----------------------------------------------------------------------------
+template <class T>
+List<T>::~List()
+{
+    clear();
+}
+
+//-----------------------------------------------------------------------------
+// Inserts newDataItem after the cursor. If the list is empty, then
+// newDataItem is inserted as the first (and only) item in the list.
+// In either case, moves the cursor to newDataItem.
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// insert Performance
+// The worst-case performance for the insert function is O(1). This is becuase 
+// there is a constant upper bound on the run time that is not dependent on the
+// size. 
+//-----------------------------------------------------------------------------
+template <class T>
+void List<T>::insert(const T& newDataItem)
+{
+    if(isEmpty()) 
+    {
+        head = new ListNode(newDataItem, 0);
+        cursor = head;
+    }
+    else
+    {
+        cursor = cursor->next = new ListNode(newDataItem, cursor->next);
+    }
+        
+}
+
+//-----------------------------------------------------------------------------
+// Removes the item marked by the cursor from a list. Moves the
+// cursor to the next item in the list. Assumes that the first list
+// item "follows" the last list item.
+//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+// remove Performance
+// The worst-case performance of remove() is O(1). This is because it has a  
+// constant time, not dependent on the input.
+//----------------------------------------------------------------------------
+template <class T>
+void List<T>::remove() 
+{
+	if(head == cursor)
+	{
+		head = cursor->next;
+	}
+	else if(cursor->next == NULL)
+	{
+		ListNode* headTemp = head;
+		headTemp = headTemp->next;
+	}
+	else
+	{
+		ListNode* cursorTemp = cursor;
+		ListNode* cursorNextTemp = cursor->next;
+		ListNode* headTemp = head;
+		
+		while(headTemp != cursor)
+		{
+			headTemp = headTemp->next;
+		}
+		
+		delete cursorTemp;
+		headTemp->next = cursorNextTemp;
+		cursor = cursorNextTemp;
+	}
+}
+
+//----------------------------------------------------------------------------
+//removeInList
+//Removes item from the List.
+//----------------------------------------------------------------------------
+template <class T>
+void List<T>::removeInList(const T& item)
+{
+	ListNode* headPtr = head;
+	bool success = true;
+	
+	if(headPtr->dataItem != item)
+	{
+		headPtr = headPtr->next;
+		success = false;
+	}
+	else if(headPtr == head)
+	{
+		ListNode* ptrHeadPtr = headPtr;
+		ListNode* headPtrNext = headPtr->next;
+		delete ptrHeadPtr;
+		ptrHeadPtr = headPtrNext;
+		head = headPtrNext;
+	}
+	else if(headPtr->next == 0)
+	{
+		ListNode* headTemp = head;
+		while(head->next != headPtr)
+		{
+			headTemp = headTemp->next;
+		}
+		delete headPtr;
+		headPtr = headTemp;
+		headTemp->next = 0;
+	}
+	else
+	{
+		ListNode* headTemp = headPtr;
+		ListNode* headPtrNext = headPtr->next;
+		ListNode* headPtrPtr = head;
+		
+		if(headPtrPtr->next != headPtr)
+		{
+			headPtrPtr = headPtrPtr->next;
+		}
+		delete headTemp;
+		headPtrPtr->next = headPtrNext;
+		headPtr = headPtrNext;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Replaces the item marked by the cursor with newDataItem and
+// leaves the cursor at newDataItem.
+//-----------------------------------------------------------------------------
+template <class T>
+void List<T>::replace(const T& newDataItem)
+{
+	cursor->dataItem = newDataItem;
+}
+
+//-----------------------------------------------------------------------------
+// Removes all the items from a list. Sets head and cursor to 0.
+//-----------------------------------------------------------------------------
+template <class T>
+void List<T>::clear()
+{	
+	while(head != NULL){
+        ListNode* temp = head;
+        head = head->next;
+        
+        delete temp;
+    }
+}
+
+//-----------------------------------------------------------------------------
+// Returns true if a list is empty. Otherwise, returns false.
+//-----------------------------------------------------------------------------
+template <class T>
+bool List<T>::isEmpty() const
+{
+    return (head == 0);
+}
+
+//-----------------------------------------------------------------------------
+// Returns true if a list is full. Otherwise, returns false.
+//-----------------------------------------------------------------------------
+template <class T>
+bool List<T>::isFull() const
+{
+    return false;
+}
+
+//----------------------------------------------------------------------------
+// Returns true if item is found in List. Otherwise, returns false.
+//----------------------------------------------------------------------------
+template <class T>
+bool List<T>::search(const T& item, T& returnItem) const
+{
+	bool success = false;
+	
+	ListNode* headPtr;
+	
+	if(headPtr != 0)
+	{
+		if(headPtr->dataItem == item)
+		{
+			returnItem = headPtr->dataItem;
+			success = true;
+		}
+	}
+	
+	return success;
+}
+
+//-----------------------------------------------------------------------------
+// If a list is not empty, then moves the cursor to the beginning of
+// the list. If list is empty, throws logic error.
+//-----------------------------------------------------------------------------
+template <class T>
+void List<T>::gotoBeginning()
+{
+		if(!isEmpty())
+		{
+			cursor == 0;
+		}
+		else
+		{
+			throw logic_error("Error: list is empty");
+		}
+}
+
+//-----------------------------------------------------------------------------
+// If a list is not empty, then moves the cursor to the end of the
+// list. Otherwise, throws logic_error.
+//-----------------------------------------------------------------------------
+template <class T>
+void List<T>::gotoEnd()
+{
+		if(!isEmpty())
+		{
+			while(cursor->next != NULL)
+			{
+				cursor = cursor->next;
+			}
+			
+		}
+		else
+		{
+			throw logic_error("Error: list is empty");
+		}
+}
+
+//-----------------------------------------------------------------------------
+// If the cursor is not at the end of a list, then moves the
+// cursor to the next item in the list and returns true. Otherwise, 
+// leaves cursor unmoved and returns false.
+//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+// gotoNext Performance
+// The worst-case performance for gotoNext() is O(1). This is because the
+// operations performed are constant ana not dependent on size.
+//----------------------------------------------------------------------------
+template <class T>
+bool List<T>::gotoNext()
+{
+	if(cursor != NULL)
+	{
+        cursor ++;
+        
+        return true;
+    }
+    else
+    {
+    	return false;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// If the cursor is not at the beginning of a list, then moves the
+// cursor to the preceeding item in the list and returns true.
+// Otherwise, returns false.
+//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+// gotoPrior Performance
+// The worst-case performance for gotoPrior() is O(n). This is because the
+// number of operations to be preformed are dependent on the size.
+//----------------------------------------------------------------------------
+template <class T>
+bool List<T>::gotoPrior()
+{
+	if(cursor != 0)
+	{
+		cursor --;
+		
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Returns the item marked by the cursor. Requires that list is not empty.
+//-----------------------------------------------------------------------------
+template <class T>
+T List<T>::getCursor() const
+{
+	if(!isEmpty())
+	{
+		return cursor->dataItem;
+	}
+	else
+	{
+		cout<< "List must be empty" <<endl;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Outputs the items in a list. If the list is empty, outputs
+// "Empty list". This operation is intended for testing and
+// debugging purposes only.
+//-----------------------------------------------------------------------------
+template <class T>
+void List<T>::showStructure() const
+{
+    if(isEmpty())
+    {
+        cout<<"Empty List"<<endl;
+    }
+    else
+    {
+        for(ListNode* temp = head; temp != 0; temp = temp->next)
+        {
+            if(temp == cursor)
+            {
+                cout<<"[";
+            }
+            
+            cout<<temp->dataItem;
+        
+            if(temp == cursor)
+            {
+                cout<<"]";
+            }
+        
+            cout<<" ";
+        }
+    }
+}
+
+#endif		// LISTLINKED_CPP
