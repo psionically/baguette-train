@@ -1,0 +1,163 @@
+// ---------------------------------------------------------------------------
+// C++ implementation of templatized Hash Table ADT.
+// Avoiding collisions using chaining.
+// ---------------------------------------------------------------------------
+#ifndef HASH_TABLE_CPP
+#define HASH_TABLE_CPP
+
+#include <iostream>
+#include "hash_table.h"
+//#include "list_linked.cpp"
+
+using namespace std;
+
+//----------------------------------------------------------------------------
+//constructor
+//----------------------------------------------------------------------------
+template<class T, class K>
+HashTable<T, K>::HashTable(int initTableSize):tableSize(initTableSize)
+{
+	dataTable = new List<K>[tableSize];
+}
+
+//----------------------------------------------------------------------------
+//copy constructor
+//----------------------------------------------------------------------------
+template<class T, class K>
+HashTable<T, K>::HashTable(const HashTable& other)
+{
+	tableSize = other.tableSize;
+	dataTable = new List<K>[tableSize];
+	
+	for(int i = 0; i < tableSize; i++)
+	{
+		dataTable[i] = other.dataTable[i];
+	}
+}
+
+//----------------------------------------------------------------------------
+//assignment operator overload
+//----------------------------------------------------------------------------
+template<class T, class K>
+HashTable<T, K>& HashTable<T, K>::operator =(const HashTable& other)
+{
+	if (other.isEmpty()){
+		delete [] this->dataTable;
+		this->tableSize = other.tableSize;
+		this->dataTable = new List<K>[this->tableSize];
+		return *this;
+	}
+	delete [] this->dataTable;
+	this->tableSize = other.tableSize;
+	this->dataTable = new List<K>[tableSize];
+	for (int i = 0; i < this->tableSize; i++){
+		dataTable[i] = other.dataTable[i];
+	}
+	return *this;
+}
+
+//----------------------------------------------------------------------------
+//destructor
+//----------------------------------------------------------------------------
+template<class T, class K>
+HashTable<T, K>::~HashTable()
+{
+	delete [] dataTable;
+}
+
+//----------------------------------------------------------------------------
+//retreive
+//----------------------------------------------------------------------------
+template <class T, class K>
+bool HashTable<T, K>::retrieve(const K& searchKey, T& returnItem) const
+{
+	K keyValue;
+	bool success = false;
+	int index = T::hash(searchKey) % tableSize;
+
+	if(dataTable[index].search(searchKey, keyValue))
+	{
+		returnItem.setKey(keyValue);
+		returnItem.setValue(index);
+		
+		success = true;
+	}
+	
+	return success;
+}
+
+//----------------------------------------------------------------------------
+//insert
+//----------------------------------------------------------------------------
+template <class T, class K>
+void HashTable<T, K>::insert(const T& item)
+{
+	int index = T::hash(item.getKey()) % tableSize;
+	dataTable[index].insert(item.getKey());
+}
+
+//----------------------------------------------------------------------------
+//clear
+//----------------------------------------------------------------------------
+template <class T, class K>
+void HashTable<T, K>::clear()
+{
+	delete [] dataTable;
+}
+
+//----------------------------------------------------------------------------
+//isEmpty
+//----------------------------------------------------------------------------
+template <class T, class K>
+bool HashTable<T, K>::isEmpty() const
+{
+	bool success = false;
+	
+	for(int i = 0; i < tableSize; i++)
+	{
+		if(dataTable[i].isEmpty())
+		{
+			success = true;
+		}
+	}
+	
+	return success;
+}
+
+//----------------------------------------------------------------------------
+//remove
+//----------------------------------------------------------------------------
+template <class T, class K>
+bool HashTable<T, K>::remove(const K& key)
+{
+	K keyValue;
+	int index = T::hash(key) % tableSize;
+	
+	if(dataTable[index].search(key, keyValue)){
+		dataTable[index].removeInList(key);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+//----------------------------------------------------------------------------
+//showStructure
+//----------------------------------------------------------------------------
+template <class T, class K>
+void HashTable<T, K>::showStructure() const
+{
+	for(int i = 0; i < tableSize; i++)
+	{
+		cout<< i << ": ";
+		if(!dataTable[i].isEmpty())
+		{
+			dataTable[i].showStructure();
+		}
+		cout<<endl;
+	}
+}
+
+#endif
