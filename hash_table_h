@@ -2,12 +2,12 @@
 // C++ header of templatized Hash Table ADT.
 // Avoiding collisions using chaining.
 // -----------------------------------------------------------------------------
-#ifndef HASHTABLE_H
-#define HASHTABLE_H
+#ifndef HASH_TABLE_H
+#define HASH_TABLE_H
 
 #include <iostream>
 #include <string>
-#include "ListLinked.cpp"
+#include "list_linked.cpp"
 
 using namespace std;
 
