@@ -7,7 +7,7 @@
 
 using namespace std;
 
-#include "HashTable.cpp"
+#include "hash_table.cpp"
 
 class TestData {
   public:
