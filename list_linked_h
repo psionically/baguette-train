@@ -1,0 +1,54 @@
+// ---------------------------------------------------------------------------
+// list_linked.h
+// ---------------------------------------------------------------------------
+#ifndef LIST_LINKED_H
+#define LIST_LINKED_H
+
+#include <stdexcept>
+#include <iostream>
+
+using namespace std;
+
+template <class T>
+class List {
+  public:
+    List(int ignored = 0);
+    List(const List<T>& other);
+    List<T>& operator=(const List<T>& other);
+    ~List();
+
+    void insert(const T& newDataItem);
+    void remove();
+    void removeInList(const T& item);
+    void replace(const T& newDataItem);
+    void clear();
+    
+    bool isEmpty() const;
+    bool isFull() const;
+    bool search(const T& item, T& returnItem) const;
+
+    void gotoBeginning();
+    void gotoEnd();
+    bool gotoNext();
+    bool gotoPrior();
+
+    T getCursor() const;
+
+    void showStructure() const;
+
+  private:
+    class ListNode  //nested class, only member functions can access
+    {
+      public:
+	ListNode(const T& nodeData, ListNode* nextPtr);
+
+	T dataItem;
+	ListNode* next;
+    };
+
+    ListNode* head;
+    ListNode* cursor;
+
+};
+
+#endif
